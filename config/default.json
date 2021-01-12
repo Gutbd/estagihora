@@ -1,3 +1,6 @@
 {
-  "mongoURI": "mongodb://localhost:27017/estagihora"
+  "mongoURI": "mongodb://localhost:27017/estagihora",
+  "jwtSecret": "13EstagiHoraGalo131908",
+  "jwtExpiresIn": "7d",
+  "checkpointMinimalInterval": "1"
 }

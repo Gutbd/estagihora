@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const UserSchema = new mongoose.Schema({
   // Name
@@ -25,9 +25,9 @@ const UserSchema = new mongoose.Schema({
 UserSchema.statics = {
   isUniqueEmail(email) {
     return this.findOne({ email }).then((result) => {
-      if (result) throw new Error('E-mail já cadastrado');
+      if (result) throw new Error("E-mail já cadastrado");
     });
   },
 };
 
-module.exports = User = mongoose.model('User', UserSchema);
+module.exports = User = mongoose.model("User", UserSchema);

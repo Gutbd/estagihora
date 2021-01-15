@@ -1,21 +1,62 @@
-const express = require('express');
+const express = require("express");
+const mongoose = require("mongoose");
 const router = express.Router();
-const auth = require('../../middleware/auth');
+const auth = require("../../middleware/auth");
 
-const config = require('config');
+const config = require("config");
+const startOfDay = require("date-fns/startOfDay");
+const endOfDay = require("date-fns/endOfDay");
 
-const Checkpoint = require('../../models/Checkpoint');
+const Checkpoint = require("../../models/Checkpoint");
 
 // @route   GET api/checkpoint
-// @desc    Get all checkpoints from a user
+// @desc    Get all checkpoints from a user grouped by day
 // @access  Private
-router.get('/', auth, async (req, res) => {
+router.get("/", auth, async (req, res) => {
   try {
     const user = req.user.id;
-    const checkpoints = await Checkpoint.find({ user });
+    const checkpoints = await Checkpoint.aggregate([
+      { $match: { user: mongoose.Types.ObjectId(user) } },
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
+          dates: { $push: "$date" },
+        },
+      },
+    ]);
 
     res.send(checkpoints);
-  } catch (err) {
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ errors: [{ msg: error.message }] });
+  }
+});
+
+// @route   GET api/checkpoint/today
+// @desc    Get all checkpoints from a user filter by today
+// @access  Private
+router.get("/today", auth, async (req, res) => {
+  try {
+    const user = req.user.id;
+    const now = new Date();
+
+    const checkpoints = await Checkpoint.aggregate([
+      {
+        $match: {
+          user: mongoose.Types.ObjectId(user),
+          date: { $gte: startOfDay(now), $lte: endOfDay(now) },
+        },
+      },
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
+          dates: { $push: "$date" },
+        },
+      },
+    ]);
+
+    res.send(checkpoints);
+  } catch (error) {
     res.status(500).json({ errors: [{ msg: error.message }] });
   }
 });
@@ -23,12 +64,12 @@ router.get('/', auth, async (req, res) => {
 // @route   POST api/checkpoint
 // @desc    Create a checkpoint
 // @access  Private
-router.post('/', auth, async (req, res) => {
+router.post("/", auth, async (req, res) => {
   try {
     const user = req.user.id;
 
     // Avoid two checkpoints too close
-    const minimalInterval = config.get('checkpointMinimalInterval');
+    const minimalInterval = config.get("checkpointMinimalInterval");
 
     var dateLimit = new Date();
     dateLimit.setMinutes(dateLimit.getMinutes() - minimalInterval);
@@ -39,19 +80,38 @@ router.post('/', auth, async (req, res) => {
     });
     if (recentCheckpoint) {
       return res.status(400).json({
-        msg: `Aguarde um intervalo de ${minimalInterval} minuto(s) entre batidas.`,
+        errors: [
+          {
+            msg: `Aguarde um intervalo de ${minimalInterval} minuto(s) entre batidas.`,
+          },
+        ],
       });
     }
 
     // Create Checkpoint
     let now = new Date();
-    let cheackpoint = new Checkpoint({ user, date: now });
-    await cheackpoint.save();
+    let checkpoint = new Checkpoint({ user, date: now });
+    await checkpoint.save();
 
-    res.json(cheackpoint);
+    // Return updated list
+    const checkpoints = await Checkpoint.aggregate([
+      {
+        $match: {
+          user: mongoose.Types.ObjectId(user),
+          date: { $gte: startOfDay(now), $lte: endOfDay(now) },
+        },
+      },
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
+          dates: { $push: "$date" },
+        },
+      },
+    ]);
+
+    res.json(checkpoints);
   } catch (err) {
-    console.log(err.message);
-    res.status(500).send('Server Error');
+    res.status(500).send("Server Error");
   }
 });
 

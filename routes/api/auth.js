@@ -1,22 +1,22 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const bcrypt = require('bcryptjs');
-const auth = require('../../middleware/auth');
-const User = require('../../models/User');
-const jwt = require('jsonwebtoken');
-const config = require('config');
-const { check, validationResult } = require('express-validator');
+const bcrypt = require("bcryptjs");
+const auth = require("../../middleware/auth");
+const User = require("../../models/User");
+const jwt = require("jsonwebtoken");
+const config = require("config");
+const { check, validationResult } = require("express-validator");
 
 // @route   GET api/auth
 // @desc    Get auth user
 // @access  Private
-router.get('/', auth, async (req, res) => {
+router.get("/", auth, async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).select('-password');
+    const user = await User.findById(req.user.id).select("-password");
     res.json(user);
   } catch (err) {
     console.error(err.message);
-    res.status(500).send('Server Error');
+    res.status(500).send("Server Error");
   }
 });
 
@@ -24,10 +24,12 @@ router.get('/', auth, async (req, res) => {
 // @desc    Authenticate user and get token
 // @access  Public
 router.post(
-  '/',
+  "/",
   [
-    check('email', 'Informe um e-mail válido').isEmail(),
-    check('password', 'Senha é obrigatóra').exists(),
+    check("email", "Informe um e-mail válido").isEmail(),
+    check("password", "Senha deve ter no mínimo 6 caracteres").isLength({
+      min: 6,
+    }),
   ],
   async (req, res) => {
     const errors = validationResult(req);
@@ -43,7 +45,7 @@ router.post(
       if (!user) {
         return res
           .status(400)
-          .json({ errors: [{ msg: 'E-mail ou senha inválidos.' }] });
+          .json({ errors: [{ msg: "E-mail ou senha inválidos." }] });
       }
 
       // make sure password match
@@ -51,7 +53,7 @@ router.post(
       if (!isMatch) {
         return res
           .status(400)
-          .json({ errors: [{ msg: 'E-mail ou senha inválidos.' }] });
+          .json({ errors: [{ msg: "E-mail ou senha inválidos." }] });
       }
 
       // return jsonwebtoken
@@ -64,8 +66,8 @@ router.post(
       // JWT sign returning users token
       jwt.sign(
         payload,
-        config.get('jwtSecret'),
-        { expiresIn: config.get('jwtExpiresIn') },
+        config.get("jwtSecret"),
+        { expiresIn: config.get("jwtExpiresIn") },
         (err, token) => {
           if (err) throw err;
           res.json({ token });

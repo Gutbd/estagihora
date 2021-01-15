@@ -1,22 +1,22 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const config = require('config');
-const { check, validationResult } = require('express-validator');
-const User = require('../../models/User');
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const config = require("config");
+const { check, validationResult } = require("express-validator");
+const User = require("../../models/User");
 
 // @route   POST api/users
 // @desc    Register a user
 // @access  Public
 router.post(
-  '/',
+  "/",
   [
-    check('name', 'Nome é obrigatório').not().isEmpty(),
-    check('email', 'Utilize um e-mail válido')
+    check("name", "Nome é obrigatório").not().isEmpty(),
+    check("email", "Utilize um e-mail válido")
       .isEmail()
       .custom((email) => User.isUniqueEmail(email)),
-    check('password', 'Sua senha deve ter no mínimo 6 caracteres').isLength({
+    check("password", "Sua senha deve ter no mínimo 6 caracteres").isLength({
       min: 6,
     }),
   ],
@@ -50,15 +50,13 @@ router.post(
       };
       jwt.sign(
         payload,
-        config.get('jwtSecret'),
-        { expiresIn: config.get('jwtExpiresIn') },
+        config.get("jwtSecret"),
+        { expiresIn: config.get("jwtExpiresIn") },
         (err, token) => {
           if (err) throw err;
           res.json({ token });
         }
       );
-
-      res.status(200).json({ msg: 'Usuário cadastrado com sucesso!' });
     } catch (error) {
       res.status(500).json({ errors: [{ msg: error.message }] });
     }

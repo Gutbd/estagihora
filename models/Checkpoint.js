@@ -1,9 +1,9 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const CheckpointSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+    ref: "User",
     required: true,
   },
   date: {
@@ -11,4 +11,4 @@ const CheckpointSchema = new mongoose.Schema({
   },
 });
 
-module.exports = Checkpoint = mongoose.model('Checkpoint', CheckpointSchema);
+module.exports = Checkpoint = mongoose.model("Checkpoint", CheckpointSchema);

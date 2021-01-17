@@ -1,4 +1,4 @@
-# >>>>> utilizar a branch redux-saga onde está o projeto atualizado! Obrigado! =] 
+## >>>>> utilizar a branch redux-saga onde está o projeto atualizado! Obrigado! =] 
 
 # estagihora
 Sistema de apontamento de horas para o estagiário ver que deveria estar trabalhando mais!

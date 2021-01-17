@@ -1,5 +1,6 @@
 /* eslint-disable import/no-anonymous-default-export */
 import { createStore, applyMiddleware, Reducer, Middleware } from 'redux';
+import { persistReducer } from 'redux-persist';
 import { AuthAction, AuthState } from './modules/auth/types';
 import { LandingAction, LandingState } from './modules/landing/types';
 import { UserAction, UserState } from './modules/user/types';
@@ -18,10 +19,17 @@ export type StoreAction =
   | UserAction
   | CheckpointAction;
 
+export interface PersistConfig {
+  key: string;
+  storage: any;
+}
+
 export default (
   reducers: Reducer<StoreState, StoreAction>,
-  middlewares: Middleware[]
+  middlewares: Middleware[],
+  persistConfig: PersistConfig
 ) => {
+  const persistedReducer = persistReducer(persistConfig, reducers);
   const enhancer = applyMiddleware(...middlewares);
-  return createStore(reducers, enhancer);
+  return createStore(persistedReducer, enhancer);
 };

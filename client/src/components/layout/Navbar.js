@@ -1,19 +1,19 @@
-import React from "react";
-import { useHistory } from "react-router-dom";
-import { connect } from "react-redux";
-import PropTypes from "prop-types";
+import React from 'react';
+import { useHistory } from 'react-router-dom';
+import { connect, useSelector } from 'react-redux';
+import PropTypes from 'prop-types';
 
-import { makeStyles } from "@material-ui/core/styles";
-import AppBar from "@material-ui/core/AppBar";
-import Toolbar from "@material-ui/core/Toolbar";
-import Typography from "@material-ui/core/Typography";
-import IconButton from "@material-ui/core/IconButton";
-import MenuItem from "@material-ui/core/MenuItem";
-import Menu from "@material-ui/core/Menu";
-import MenuIcon from "@material-ui/icons/Menu";
-import { Grid } from "@material-ui/core";
+import { makeStyles } from '@material-ui/core/styles';
+import AppBar from '@material-ui/core/AppBar';
+import Toolbar from '@material-ui/core/Toolbar';
+import Typography from '@material-ui/core/Typography';
+import IconButton from '@material-ui/core/IconButton';
+import MenuItem from '@material-ui/core/MenuItem';
+import Menu from '@material-ui/core/Menu';
+import MenuIcon from '@material-ui/icons/Menu';
+import { Grid } from '@material-ui/core';
 
-import { logout } from "../../actions/auth";
+import { logoutRequest } from '../../store/modules/auth/actions';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -27,11 +27,12 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Navbar = ({ auth: { isAuthenticated, loading, user }, logout }) => {
+const Navbar = ({ logoutRequest }) => {
   const classes = useStyles();
 
-  // Get username
-  const username = user && user.name;
+  const { isSignedIn } = useSelector((state) => state.auth);
+  const { user, loading: userLoading } = useSelector((state) => state.user);
+  const username = userLoading ? 'visitante' : user && user.name;
 
   // Menu handlers
   const history = useHistory();
@@ -39,20 +40,24 @@ const Navbar = ({ auth: { isAuthenticated, loading, user }, logout }) => {
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
+
   const handleClose = () => {
     setAnchorEl(null);
   };
+
   const handleHome = () => {
     handleClose();
-    history.push("/home");
+    history.push('/home');
   };
+
   const handleHistory = () => {
     handleClose();
-    history.push("/history");
+    history.push('/history');
   };
+
   const handleLogout = () => {
     handleClose();
-    logout();
+    logoutRequest();
   };
 
   return (
@@ -67,7 +72,7 @@ const Navbar = ({ auth: { isAuthenticated, loading, user }, logout }) => {
         >
           <MenuIcon />
         </IconButton>
-        {isAuthenticated && (
+        {isSignedIn && (
           <Menu
             id='simple-menu'
             anchorEl={anchorEl}
@@ -84,7 +89,7 @@ const Navbar = ({ auth: { isAuthenticated, loading, user }, logout }) => {
         <Typography variant='h6' className={classes.title}>
           EstagiHora
         </Typography>
-        {isAuthenticated && (
+        {isSignedIn && (
           <Grid
             spacing={2}
             container
@@ -103,12 +108,7 @@ const Navbar = ({ auth: { isAuthenticated, loading, user }, logout }) => {
 };
 
 Navbar.propTypes = {
-  logout: PropTypes.func.isRequired,
-  auth: PropTypes.object.isRequired,
+  logoutRequest: PropTypes.func.isRequired,
 };
 
-const mapStateToProps = (state) => ({
-  auth: state.auth,
-});
-
-export default connect(mapStateToProps, { logout })(Navbar);
+export default connect(null, { logoutRequest })(Navbar);

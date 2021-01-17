@@ -1,9 +1,10 @@
 import React, { Fragment } from 'react';
-import { connect } from 'react-redux';
+import { connect, useSelector } from 'react-redux';
 
 import AlertMessages from './AlertMessage';
 
-const ErrorMessages = ({ errors }) => {
+const ErrorMessages = () => {
+  const { errors } = useSelector((state) => state.checkpoint);
   return (
     <Fragment>
       {errors &&

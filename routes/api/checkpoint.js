@@ -1,28 +1,29 @@
-const express = require("express");
-const mongoose = require("mongoose");
+const express = require('express');
+const mongoose = require('mongoose');
 const router = express.Router();
-const auth = require("../../middleware/auth");
+const auth = require('../../middleware/auth');
 
-const config = require("config");
-const startOfDay = require("date-fns/startOfDay");
-const endOfDay = require("date-fns/endOfDay");
+const config = require('config');
+const startOfDay = require('date-fns/startOfDay');
+const endOfDay = require('date-fns/endOfDay');
 
-const Checkpoint = require("../../models/Checkpoint");
+const Checkpoint = require('../../models/Checkpoint');
 
 // @route   GET api/checkpoint
 // @desc    Get all checkpoints from a user grouped by day
 // @access  Private
-router.get("/", auth, async (req, res) => {
+router.get('/', auth, async (req, res) => {
   try {
     const user = req.user.id;
     const checkpoints = await Checkpoint.aggregate([
       { $match: { user: mongoose.Types.ObjectId(user) } },
       {
         $group: {
-          _id: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
-          dates: { $push: "$date" },
+          _id: { $dateToString: { format: '%Y-%m-%d', date: '$date' } },
+          dates: { $push: '$date' },
         },
       },
+      { $sort: { _id: -1 } },
     ]);
 
     res.send(checkpoints);
@@ -35,7 +36,7 @@ router.get("/", auth, async (req, res) => {
 // @route   GET api/checkpoint/today
 // @desc    Get all checkpoints from a user filter by today
 // @access  Private
-router.get("/today", auth, async (req, res) => {
+router.get('/today', auth, async (req, res) => {
   try {
     const user = req.user.id;
     const now = new Date();
@@ -49,8 +50,8 @@ router.get("/today", auth, async (req, res) => {
       },
       {
         $group: {
-          _id: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
-          dates: { $push: "$date" },
+          _id: { $dateToString: { format: '%Y-%m-%d', date: '$date' } },
+          dates: { $push: '$date' },
         },
       },
     ]);
@@ -64,12 +65,12 @@ router.get("/today", auth, async (req, res) => {
 // @route   POST api/checkpoint
 // @desc    Create a checkpoint
 // @access  Private
-router.post("/", auth, async (req, res) => {
+router.post('/', auth, async (req, res) => {
   try {
     const user = req.user.id;
 
     // Avoid two checkpoints too close
-    const minimalInterval = config.get("checkpointMinimalInterval");
+    const minimalInterval = config.get('checkpointMinimalInterval');
 
     var dateLimit = new Date();
     dateLimit.setMinutes(dateLimit.getMinutes() - minimalInterval);
@@ -103,15 +104,15 @@ router.post("/", auth, async (req, res) => {
       },
       {
         $group: {
-          _id: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
-          dates: { $push: "$date" },
+          _id: { $dateToString: { format: '%Y-%m-%d', date: '$date' } },
+          dates: { $push: '$date' },
         },
       },
     ]);
 
     res.json(checkpoints);
   } catch (err) {
-    res.status(500).send("Server Error");
+    res.status(500).send('Server Error');
   }
 });
 

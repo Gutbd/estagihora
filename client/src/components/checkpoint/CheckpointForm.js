@@ -1,32 +1,19 @@
-import React, { useEffect, useState } from "react";
-import { connect } from "react-redux";
-import PropTypes from "prop-types";
+import React from 'react';
+import { connect, useSelector } from 'react-redux';
+import PropTypes from 'prop-types';
 
-import Button from "@material-ui/core/Button";
-import Container from "@material-ui/core/Container";
-import { Grid } from "@material-ui/core";
+import Button from '@material-ui/core/Button';
+import Container from '@material-ui/core/Container';
+import { Grid } from '@material-ui/core';
 
-import {
-  registerCheckpoint,
-  loadUserCheckpoints,
-} from "../../actions/checkpoint";
-import { loadUser } from "../../actions/auth";
+import { registerCheckpointRequest } from '../../store/modules/checkpoint/actions';
 
-const CheckpointForm = ({
-  registerCheckpoint,
-  checkpoint: { loading: checkpointLoading },
-  loadUser,
-}) => {
-  // Loading handler
-  const [isLoading, setLoading] = useState(false);
+const CheckpointForm = ({ registerCheckpointRequest }) => {
+  const { loading } = useSelector((state) => state.checkpoint);
 
-  // On submit
   const onSubmitCheckpoint = (e) => {
     e.preventDefault();
-
-    setLoading(true);
-    registerCheckpoint();
-    setLoading(false);
+    registerCheckpointRequest();
   };
 
   return (
@@ -38,11 +25,11 @@ const CheckpointForm = ({
               type='submit'
               variant='contained'
               color='primary'
-              disabled={isLoading || checkpointLoading}
+              disabled={loading}
               size='large'
             >
-              {" "}
-              Bater ponto!{" "}
+              {' '}
+              Bater ponto!{' '}
             </Button>
           </Grid>
         </Grid>
@@ -52,18 +39,7 @@ const CheckpointForm = ({
 };
 
 CheckpointForm.propTypes = {
-  checkpoint: PropTypes.object.isRequired,
-  loadUserCheckpoints: PropTypes.func.isRequired,
-  loadUser: PropTypes.func.isRequired,
-  registerCheckpoint: PropTypes.func.isRequired,
+  registerCheckpointRequest: PropTypes.func.isRequired,
 };
 
-const mapStateToProps = (state) => ({
-  checkpoint: state.checkpoint,
-});
-
-export default connect(mapStateToProps, {
-  registerCheckpoint,
-  loadUserCheckpoints,
-  loadUser,
-})(CheckpointForm);
+export default connect(null, { registerCheckpointRequest })(CheckpointForm);

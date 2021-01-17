@@ -1,15 +1,19 @@
 import React, { Fragment } from 'react';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
-import Routes from './components/routing/Routes';
 import { Provider } from 'react-redux';
-import { store } from './store';
+import { store, persistor } from './store';
+import { PersistGate } from 'redux-persist/integration/react';
+
 import './App.css';
-import Navbar from './components/layout/Navbar';
+
 import Landing from './pages/landing/Landing';
+import Routes from './components/routing/Routes';
+import Navbar from './components/layout/Navbar';
 
 const App = () => {
   return (
     <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}></PersistGate>
       <Router>
         <Fragment>
           <Navbar />

@@ -1,16 +1,11 @@
-import React, { Fragment } from "react";
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-import Routes from "./components/routing/Routes";
-import setAuthToken from "./services/AuthService";
-import { Provider } from "react-redux";
-import store from "./store";
-import "./App.css";
-import Navbar from "./components/layout/Navbar";
-import Home from "./components/home/Home";
-
-if (localStorage.token) {
-  setAuthToken(localStorage.token);
-}
+import React, { Fragment } from 'react';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import Routes from './components/routing/Routes';
+import { Provider } from 'react-redux';
+import { store } from './store';
+import './App.css';
+import Navbar from './components/layout/Navbar';
+import Landing from './pages/landing/Landing';
 
 const App = () => {
   return (
@@ -19,7 +14,7 @@ const App = () => {
         <Fragment>
           <Navbar />
           <Switch>
-            <Route exact path='/' component={Home} />
+            <Route exact path='/' component={Landing} />
             <Route component={Routes} />
           </Switch>
         </Fragment>
